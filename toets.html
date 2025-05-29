@@ -1,1 +1,60 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Toetsmodus – DuckStudy</title>
+</head>
+<body>
+  <a href="index.html">← Terug naar menu</a>
+  <h1>Toetsmodus</h1>
+
+  <textarea id="lijst" rows="6" cols="30" placeholder="hond,dog\nkat,cat"></textarea><br>
+  <button onclick="startToets()">Start toets</button>
+
+  <div id="output"></div>
+
+  <script>
+    function startToets() {
+      const invoer = document.getElementById("lijst").value;
+      const regels = invoer.split("\n");
+      const lijst = regels.map(r => r.split(",").map(s => s.trim())).filter(p => p.length === 2);
+
+      let index = 0;
+      let score = 0;
+      const output = document.getElementById("output");
+
+      function toonVraag() {
+        if (index >= lijst.length) {
+          output.innerHTML = `<h3>Klaar!</h3><p>Je score: ${score}/${lijst.length}</p>`;
+          return;
+        }
+
+        const vraag = lijst[index][0];
+        output.innerHTML = `
+          <p><strong>Wat is het Engels voor: <em>${vraag}</em>?</strong></p>
+          <input type="text" id="antwoordInput" placeholder="Typ je antwoord">
+          <button onclick="controleerAntwoord()">Controleer</button>
+        `;
+      }
+
+      window.controleerAntwoord = function () {
+        const antwoord = document.getElementById("antwoordInput").value.trim().toLowerCase();
+        const juist = lijst[index][1].toLowerCase();
+
+        if (antwoord === juist) {
+          score++;
+          alert("✅ Goed!");
+        } else {
+          alert(`❌ Fout. Het juiste antwoord was: ${juist}`);
+        }
+
+        index++;
+        toonVraag();
+      };
+
+      toonVraag();
+    }
+  </script>
+</body>
+</html>
 
