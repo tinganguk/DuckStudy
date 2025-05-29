@@ -5,6 +5,30 @@
   <title>DuckStudy</title>
 </head>
 <body>
-  <h1>Welkom bij DuckStudy!</h1>
+  <h1>Welkom bij DuckStudy</h1>
+
+  <h2>Voer je woordenlijst in:</h2>
+
+  <textarea id="lijst" rows="6" cols="30" placeholder="bijv. hond,chien"></textarea>
+  <br><br>
+
+  <button onclick="toonLijst()">Lijst tonen</button>
+
+  <div id="output"></div>
+
+  <script>
+    function toonLijst() {
+      const invoer = document.getElementById("lijst").value;
+      const regels = invoer.split("\n");
+      const lijst = regels.map(r => {
+        const delen = r.split(",");
+        return `Vraag: ${delen[0]}, Antwoord: ${delen[1]}`;
+      });
+
+      document.getElementById("output").innerHTML = "<h3>Jouw lijst:</h3><ul>" +
+        lijst.map(item => `<li>${item}</li>`).join('') + "</ul>";
+    }
+  </script>
 </body>
 </html>
+
