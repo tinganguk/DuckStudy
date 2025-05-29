@@ -2,16 +2,83 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <title>DuckStudy</title>
+  <title>DuckStudy – Hoofdmenu</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+    }
+    select, input, button {
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Welkom bij DuckStudy!</h1>
-  <p>Kies een modus:</p>
 
-  <ul>
-    <li><a href="lijst.html">📋 Lijstmodus</a></li>
-    <li><a href="toets.html">📝 Toetsmodus</a></li>
-    <li><a href="flashcards.html">🃏 Flashcards</a></li>
-  </ul>
+  <h1>🦆 DuckStudy – Hoofdmenu</h1>
+
+  <h2>📥 Lijst importeren</h2>
+  <textarea id="nieuweLijst" placeholder="bijv: hond,dog\nkat,cat"></textarea><br>
+  <input type="text" id="lijstNaam" placeholder="Lijstnaam"><br>
+  <button onclick="opslaan()">💾 Opslaan</button>
+
+  <h2>📂 Gemaakte lijsten</h2>
+  <select id="archief"></select><br>
+
+  <h2>🎯 Kies modus</h2>
+  <button onclick="startModus('toets')">Start 📝 Toetsmodus</button>
+  <button onclick="startModus('flashcards')">Start 🃏 Flashcards</button>
+
+  <script>
+    // Bij starten: toon opgeslagen lijsten
+    window.onload = function() {
+      updateArchief();
+    };
+
+    // Lijst opslaan
+    function opslaan() {
+      const naam = document.getElementById("lijstNaam").value.trim();
+      const inhoud = document.getElementById("nieuweLijst").value.trim();
+      if (naam && inhoud) {
+        localStorage.setItem("lijst_" + naam, inhoud);
+        updateArchief();
+        alert("Lijst opgeslagen als: " + naam);
+      } else {
+        alert("Vul een naam en inhoud in.");
+      }
+    }
+
+    // Archief bijwerken
+    function updateArchief() {
+      const archief = document.getElementById("archief");
+      archief.innerHTML = "";
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith("lijst_")) {
+          const naam = key.replace("lijst_", "");
+          const option = document.createElement("option");
+          option.value = naam;
+          option.textContent = naam;
+          archief.appendChild(option);
+        }
+      }
+    }
+
+    // Modus starten met gekozen lijst
+    function startModus(modus) {
+      const gekozen = document.getElementById("archief").value;
+      if (!gekozen) {
+        alert("Kies een lijst!");
+        return;
+      }
+      localStorage.setItem("gekozenLijst", gekozen);
+      window.location.href = modus + ".html";
+    }
+  </script>
+
 </body>
 </html>
