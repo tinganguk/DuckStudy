@@ -2,59 +2,62 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <title>Toetsmodus – DuckStudy</title>
+  <title>DuckStudy – Toetsmodus</title>
 </head>
 <body>
+
   <a href="index.html">← Terug naar menu</a>
-  <h1>Toetsmodus</h1>
-
-  <textarea id="lijst" rows="6" cols="30" placeholder="hond,dog\nkat,cat"></textarea><br>
-  <button onclick="startToets()">Start toets</button>
-
+  <h1>📝 Toetsmodus</h1>
   <div id="output"></div>
 
   <script>
-    function startToets() {
-      const invoer = document.getElementById("lijst").value;
-      const regels = invoer.split("\n");
-      const lijst = regels.map(r => r.split(",").map(s => s.trim())).filter(p => p.length === 2);
+    const gekozen = localStorage.getItem("gekozenLijst");
+    const data = localStorage.getItem("lijst_" + gekozen);
 
-      let index = 0;
-      let score = 0;
-      const output = document.getElementById("output");
+    if (!gekozen || !data) {
+      document.getElementById("output").innerHTML = "❌ Geen lijst geselecteerd.";
+      throw new Error("Geen lijst gevonden");
+    }
 
-      function toonVraag() {
-        if (index >= lijst.length) {
-          output.innerHTML = `<h3>Klaar!</h3><p>Je score: ${score}/${lijst.length}</p>`;
-          return;
-        }
+    const regels = data.split("\n");
+    const lijst = regels.map(r => r.split(",").map(s => s.trim())).filter(p => p.length === 2);
 
-        const vraag = lijst[index][0];
-        output.innerHTML = `
-          <p><strong>Wat is het Engels voor: <em>${vraag}</em>?</strong></p>
-          <input type="text" id="antwoordInput" placeholder="Typ je antwoord">
-          <button onclick="controleerAntwoord()">Controleer</button>
-        `;
+    let index = 0;
+    let score = 0;
+    const output = document.getElementById("output");
+
+    function toonVraag() {
+      if (index >= lijst.length) {
+        output.innerHTML = `<h3>Klaar!</h3><p>Je score: ${score}/${lijst.length}</p>`;
+        return;
       }
 
-      window.controleerAntwoord = function () {
-        const antwoord = document.getElementById("antwoordInput").value.trim().toLowerCase();
-        const juist = lijst[index][1].toLowerCase();
+      const vraag = lijst[index][0];
+      output.innerHTML = `
+        <p><strong>Wat is het Engels voor: <em>${vraag}</em>?</strong></p>
+        <input type="text" id="antwoordInput" placeholder="Typ je antwoord">
+        <button onclick="controleerAntwoord()">Controleer</button>
+      `;
+    }
 
-        if (antwoord === juist) {
-          score++;
-          alert("✅ Goed!");
-        } else {
-          alert(`❌ Fout. Het juiste antwoord was: ${juist}`);
-        }
+    function controleerAntwoord() {
+      const antwoord = document.getElementById("antwoordInput").value.trim().toLowerCase();
+      const juist = lijst[index][1].toLowerCase();
 
-        index++;
-        toonVraag();
-      };
+      if (antwoord === juist) {
+        score++;
+        alert("✅ Goed!");
+      } else {
+        alert(`❌ Fout. Het juiste antwoord was: ${juist}`);
+      }
 
+      index++;
       toonVraag();
     }
+
+    window.controleerAntwoord = controleerAntwoord;
+    toonVraag();
   </script>
+
 </body>
 </html>
-
