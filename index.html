@@ -3,32 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <title>DuckStudy</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background-color: #fefefe;
+      color: #222;
+    }
+    h1 { color: #2b6cb0; }
+    select, textarea, input, button {
+      font-size: 1em;
+      padding: 6px;
+      margin: 6px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #3182ce;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover { background-color: #2c5282; }
+    textarea { width: 100%; max-width: 400px; }
+    #output { margin-top: 20px; }
+  </style>
 </head>
 <body>
   <h1>Welkom bij DuckStudy!</h1>
 
-  <label for="modus">Kies modus:</label>
+  <label for="modus">🎯 Kies modus:</label>
   <select id="modus">
     <option value="lijst">📋 Lijst</option>
     <option value="flashcards">🃏 Flashcards</option>
-    <option value="toets" disabled>✏️ Toets (binnenkort)</option>
-    <option value="gedachten" disabled>💭 Gedachten (binnenkort)</option>
   </select>
-  
-  <h2>Voer je woordenlijst in:</h2>
-  <textarea id="lijst" rows="6" cols="50" placeholder="bijv. hond,chien&#10;kat,chat"></textarea><br>
 
-  <button onclick="toonLijst()">Lijst tonen</button>
+  <h2>📥 Voer je woordenlijst in:</h2>
+  <textarea id="lijst" rows="6" placeholder="bijv. hond,chien&#10;kat,chat"></textarea><br>
+  <button onclick="startModus()">Start</button>
 
-  <h3>Lijst opslaan</h3>
+  <h3>💾 Lijst opslaan</h3>
   <input type="text" id="lijstNaam" placeholder="Naam van de lijst">
-  <button onclick="slaLijstOp()">💾 Opslaan</button>
+  <button onclick="slaLijstOp()">Opslaan</button>
 
   <h3>📂 Lijstenarchief</h3>
   <select id="archiefDropdown" onchange="laadLijst()">
     <option disabled selected>Kies een opgeslagen lijst</option>
   </select>
-    <div id="output" style="margin-top: 20px;"></div>
+
+  <div id="output"></div>
 
   <script>
     let kaarten = [];
@@ -39,10 +62,11 @@
       const modus = document.getElementById("modus").value;
       const invoer = document.getElementById("lijst").value;
       const regels = invoer.split("\n");
+
       kaarten = regels.map(r => {
         const delen = r.split(",");
-        return { vraag: delen[0].trim(), antwoord: delen[1].trim() };
-      });
+        return { vraag: delen[0]?.trim(), antwoord: delen[1]?.trim() };
+      }).filter(k => k.vraag && k.antwoord);
 
       index = 0;
       antwoordZichtbaar = false;
@@ -51,27 +75,24 @@
         toonLijst();
       } else if (modus === "flashcards") {
         toonKaart();
-      } else {
-        document.getElementById("output").innerHTML = "<p>Deze modus is nog in ontwikkeling.</p>";
       }
     }
 
     function toonLijst() {
-      const lijst = kaarten.map(k => `Vraag: ${k.vraag}, Antwoord: ${k.antwoord}`);
-      document.getElementById("output").innerHTML = "<h3>Jouw lijst:</h3><ul>" +
-        lijst.map(item => `<li>${item}</li>`).join('') + "</ul>";
+      const output = kaarten.map(k => `<li>${k.vraag} → ${k.antwoord}</li>`).join('');
+      document.getElementById("output").innerHTML = `<ul>${output}</ul>`;
     }
 
     function toonKaart() {
       if (kaarten.length === 0) {
-        document.getElementById("output").innerHTML = "<p>Geen kaarten geladen.</p>";
+        document.getElementById("output").innerHTML = "<p>Geen kaarten beschikbaar.</p>";
         return;
       }
 
-      const huidige = kaarten[index];
+      const kaart = kaarten[index];
       const inhoud = antwoordZichtbaar
-        ? `<strong>Antwoord:</strong> ${huidige.antwoord}`
-        : `<strong>Vraag:</strong> ${huidige.vraag}`;
+        ? `<strong>Antwoord:</strong> ${kaart.antwoord}`
+        : `<strong>Vraag:</strong> ${kaart.vraag}`;
 
       document.getElementById("output").innerHTML = `
         <p>${inhoud}</p>
@@ -94,25 +115,28 @@
     function slaLijstOp() {
       const naam = document.getElementById("lijstNaam").value.trim();
       const inhoud = document.getElementById("lijst").value;
-
       if (!naam || !inhoud) {
         alert("Vul zowel een naam als een lijst in.");
         return;
       }
-
       localStorage.setItem("lijst_" + naam, inhoud);
       updateArchiefDropdown();
-      alert("Lijst '" + naam + "' opgeslagen!");
+      alert("Lijst opgeslagen!");
+    }
+
+    function laadLijst() {
+      const naam = document.getElementById("archiefDropdown").value;
+      const inhoud = localStorage.getItem("lijst_" + naam);
+      document.getElementById("lijst").value = inhoud;
     }
 
     function updateArchiefDropdown() {
       const dropdown = document.getElementById("archiefDropdown");
       dropdown.innerHTML = '<option disabled selected>Kies een opgeslagen lijst</option>';
-
       for (let i = 0; i < localStorage.length; i++) {
-        const sleutel = localStorage.key(i);
-        if (sleutel.startsWith("lijst_")) {
-          const naam = sleutel.replace("lijst_", "");
+        const key = localStorage.key(i);
+        if (key.startsWith("lijst_")) {
+          const naam = key.replace("lijst_", "");
           const optie = document.createElement("option");
           optie.value = naam;
           optie.textContent = naam;
@@ -121,15 +145,7 @@
       }
     }
 
-    function laadLijst() {
-      const naam = document.getElementById("archiefDropdown").value;
-      const inhoud = localStorage.getItem("lijst_" + naam);
-      document.getElementById("lijst").value = inhoud;
-      alert("Lijst '" + naam + "' geladen!");
-    }
-
     window.onload = updateArchiefDropdown;
   </script>
 </body>
 </html>
-
