@@ -1,1 +1,97 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Flashcards – DuckStudy</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .card {
+      border: 2px solid #333;
+      border-radius: 10px;
+      padding: 30px;
+      width: 300px;
+      text-align: center;
+      font-size: 1.5rem;
+      margin: 20px auto;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background-color: #f9f9f9;
+    }
+    .card:hover {
+      background-color: #eee;
+    }
+    .controls {
+      text-align: center;
+      margin-top: 10px;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="index.html">← Terug naar menu</a>
+  <h1>Flashcards-modus</h1>
+
+  <p>Voer je woordenlijst in (bv: hond,dog):</p>
+  <textarea id="lijst" placeholder="hond,dog\nkat,cat"></textarea>
+  <br>
+  <button onclick="startFlashcards()">Start Flashcards</button>
+
+  <div id="cardContainer"></div>
+  <div class="controls">
+    <button onclick="volgendeKaart()">Volgende kaart</button>
+  </div>
+
+  <script>
+    let flashcards = [];
+    let huidigeIndex = 0;
+    let antwoordZichtbaar = false;
+
+    function startFlashcards() {
+      const invoer = document.getElementById("lijst").value;
+      const regels = invoer.split("\n");
+      flashcards = regels.map(r => r.split(",").map(s => s.trim())).filter(p => p.length === 2);
+      huidigeIndex = 0;
+      antwoordZichtbaar = false;
+      toonKaart();
+    }
+
+    function toonKaart() {
+      if (huidigeIndex >= flashcards.length) {
+        document.getElementById("cardContainer").innerHTML = "<p>Klaar met alle kaarten!</p>";
+        return;
+      }
+
+      const kaart = flashcards[huidigeIndex];
+      const inhoud = antwoordZichtbaar ? kaart[1] : kaart[0];
+      const label = antwoordZichtbaar ? "Antwoord" : "Vraag";
+
+      document.getElementById("cardContainer").innerHTML = `
+        <div class="card" onclick="draaiKaart()">
+          <strong>${label}:</strong><br>${inhoud}
+        </div>
+      `;
+    }
+
+    function draaiKaart() {
+      antwoordZichtbaar = !antwoordZichtbaar;
+      toonKaart();
+    }
+
+    function volgendeKaart() {
+      huidigeIndex++;
+      antwoordZichtbaar = false;
+      toonKaart();
+    }
+  </script>
+
+</body>
+</html>
 
