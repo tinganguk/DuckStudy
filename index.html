@@ -17,17 +17,51 @@
   <div id="output"></div>
 
   <script>
-    function toonLijst() {
-      const invoer = document.getElementById("lijst").value;
-      const regels = invoer.split("\n");
-      const lijst = regels.map(r => {
-        const delen = r.split(",");
-        return `Vraag: ${delen[0]}, Antwoord: ${delen[1]}`;
-      });
+    let kaarten = [];
+  let index = 0;
+  let antwoordZichtbaar = false;
 
-      document.getElementById("output").innerHTML = "<h3>Jouw lijst:</h3><ul>" +
-        lijst.map(item => `<li>${item}</li>`).join('') + "</ul>";
+  function toonLijst() {
+    const invoer = document.getElementById("lijst").value;
+    const regels = invoer.split("\n");
+    kaarten = regels.map(r => {
+      const delen = r.split(",");
+      return { vraag: delen[0].trim(), antwoord: delen[1].trim() };
+    });
+
+    index = 0;
+    antwoordZichtbaar = false;
+    toonKaart();
+  }
+
+  function toonKaart() {
+    if (kaarten.length === 0) {
+      document.getElementById("output").innerHTML = "<p>Geen kaarten geladen.</p>";
+      return;
     }
+
+    const huidige = kaarten[index];
+    const inhoud = antwoordZichtbaar
+      ? `<strong>Antwoord:</strong> ${huidige.antwoord}`
+      : `<strong>Vraag:</strong> ${huidige.vraag}`;
+
+    document.getElementById("output").innerHTML = `
+      <p>${inhoud}</p>
+      <button onclick="wissel()">Toon ${antwoordZichtbaar ? 'vraag' : 'antwoord'}</button>
+      <button onclick="volgendeKaart()">Volgende</button>
+    `;
+  }
+
+  function wissel() {
+    antwoordZichtbaar = !antwoordZichtbaar;
+    toonKaart();
+  }
+
+  function volgendeKaart() {
+    index = (index + 1) % kaarten.length;
+    antwoordZichtbaar = false;
+    toonKaart();
+  }
   </script>
 </body>
 </html>
