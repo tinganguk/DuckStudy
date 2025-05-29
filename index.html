@@ -7,61 +7,128 @@
 <body>
   <h1>Welkom bij DuckStudy!</h1>
 
+  <label for="modus">Kies modus:</label>
+  <select id="modus">
+    <option value="lijst">📋 Lijst</option>
+    <option value="flashcards">🃏 Flashcards</option>
+    <option value="toets" disabled>✏️ Toets (binnenkort)</option>
+    <option value="gedachten" disabled>💭 Gedachten (binnenkort)</option>
+  </select>
+  
   <h2>Voer je woordenlijst in:</h2>
-
-  <textarea id="lijst" rows="6" cols="30" placeholder="bijv. hond,chien"></textarea>
-  <br><br>
+  <textarea id="lijst" rows="6" cols="50" placeholder="bijv. hond,chien&#10;kat,chat"></textarea><br>
 
   <button onclick="toonLijst()">Lijst tonen</button>
 
-  <div id="output"></div>
+  <h3>Lijst opslaan</h3>
+  <input type="text" id="lijstNaam" placeholder="Naam van de lijst">
+  <button onclick="slaLijstOp()">💾 Opslaan</button>
+
+  <h3>📂 Lijstenarchief</h3>
+  <select id="archiefDropdown" onchange="laadLijst()">
+    <option disabled selected>Kies een opgeslagen lijst</option>
+  </select>
+    <div id="output" style="margin-top: 20px;"></div>
 
   <script>
     let kaarten = [];
-  let index = 0;
-  let antwoordZichtbaar = false;
+    let index = 0;
+    let antwoordZichtbaar = false;
 
-  function toonLijst() {
-    const invoer = document.getElementById("lijst").value;
-    const regels = invoer.split("\n");
-    kaarten = regels.map(r => {
-      const delen = r.split(",");
-      return { vraag: delen[0].trim(), antwoord: delen[1].trim() };
-    });
+    function startModus() {
+      const modus = document.getElementById("modus").value;
+      const invoer = document.getElementById("lijst").value;
+      const regels = invoer.split("\n");
+      kaarten = regels.map(r => {
+        const delen = r.split(",");
+        return { vraag: delen[0].trim(), antwoord: delen[1].trim() };
+      });
 
-    index = 0;
-    antwoordZichtbaar = false;
-    toonKaart();
-  }
+      index = 0;
+      antwoordZichtbaar = false;
 
-  function toonKaart() {
-    if (kaarten.length === 0) {
-      document.getElementById("output").innerHTML = "<p>Geen kaarten geladen.</p>";
-      return;
+      if (modus === "lijst") {
+        toonLijst();
+      } else if (modus === "flashcards") {
+        toonKaart();
+      } else {
+        document.getElementById("output").innerHTML = "<p>Deze modus is nog in ontwikkeling.</p>";
+      }
     }
 
-    const huidige = kaarten[index];
-    const inhoud = antwoordZichtbaar
-      ? `<strong>Antwoord:</strong> ${huidige.antwoord}`
-      : `<strong>Vraag:</strong> ${huidige.vraag}`;
+    function toonLijst() {
+      const lijst = kaarten.map(k => `Vraag: ${k.vraag}, Antwoord: ${k.antwoord}`);
+      document.getElementById("output").innerHTML = "<h3>Jouw lijst:</h3><ul>" +
+        lijst.map(item => `<li>${item}</li>`).join('') + "</ul>";
+    }
 
-    document.getElementById("output").innerHTML = `
-      <p>${inhoud}</p>
-      <button onclick="wissel()">Toon ${antwoordZichtbaar ? 'vraag' : 'antwoord'}</button>
-      <button onclick="volgendeKaart()">Volgende</button>
-    `;
-  }
+    function toonKaart() {
+      if (kaarten.length === 0) {
+        document.getElementById("output").innerHTML = "<p>Geen kaarten geladen.</p>";
+        return;
+      }
 
-  function wissel() {
-    antwoordZichtbaar = !antwoordZichtbaar;
-    toonKaart();
-  }
+      const huidige = kaarten[index];
+      const inhoud = antwoordZichtbaar
+        ? `<strong>Antwoord:</strong> ${huidige.antwoord}`
+        : `<strong>Vraag:</strong> ${huidige.vraag}`;
 
-  function volgendeKaart() {
-    index = (index + 1) % kaarten.length;
-    antwoordZichtbaar = false;
-    toonKaart();
-  }
+      document.getElementById("output").innerHTML = `
+        <p>${inhoud}</p>
+        <button onclick="wissel()">Toon ${antwoordZichtbaar ? 'vraag' : 'antwoord'}</button>
+        <button onclick="volgendeKaart()">Volgende</button>
+      `;
+    }
+
+    function wissel() {
+      antwoordZichtbaar = !antwoordZichtbaar;
+      toonKaart();
+    }
+
+    function volgendeKaart() {
+      index = (index + 1) % kaarten.length;
+      antwoordZichtbaar = false;
+      toonKaart();
+    }
+
+    function slaLijstOp() {
+      const naam = document.getElementById("lijstNaam").value.trim();
+      const inhoud = document.getElementById("lijst").value;
+
+      if (!naam || !inhoud) {
+        alert("Vul zowel een naam als een lijst in.");
+        return;
+      }
+
+      localStorage.setItem("lijst_" + naam, inhoud);
+      updateArchiefDropdown();
+      alert("Lijst '" + naam + "' opgeslagen!");
+    }
+
+    function updateArchiefDropdown() {
+      const dropdown = document.getElementById("archiefDropdown");
+      dropdown.innerHTML = '<option disabled selected>Kies een opgeslagen lijst</option>';
+
+      for (let i = 0; i < localStorage.length; i++) {
+        const sleutel = localStorage.key(i);
+        if (sleutel.startsWith("lijst_")) {
+          const naam = sleutel.replace("lijst_", "");
+          const optie = document.createElement("option");
+          optie.value = naam;
+          optie.textContent = naam;
+          dropdown.appendChild(optie);
+        }
+      }
+    }
+
+    function laadLijst() {
+      const naam = document.getElementById("archiefDropdown").value;
+      const inhoud = localStorage.getItem("lijst_" + naam);
+      document.getElementById("lijst").value = inhoud;
+      alert("Lijst '" + naam + "' geladen!");
+    }
+
+    window.onload = updateArchiefDropdown;
   </script>
 </body>
 </html>
