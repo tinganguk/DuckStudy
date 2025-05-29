@@ -1,2 +1,2 @@
 # DuckStudy
-Een FOSS client vergelijkbaar met Studygo
+Een FOSS website voor Studygo
