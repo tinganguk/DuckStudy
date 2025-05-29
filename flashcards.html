@@ -7,37 +7,45 @@
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
+      text-align: center;
     }
     .card {
       border: 2px solid #333;
-      border-radius: 10px;
-      padding: 30px;
+      border-radius: 12px;
+      padding: 20px;
       width: 300px;
-      text-align: center;
-      font-size: 1.5rem;
-      margin: 20px auto;
+      margin: 30px auto;
+      background-color: #fefefe;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+    }
+    .lijn {
+      border-top: 2px solid #333;
+      margin: 10px 0;
+    }
+    .vraag {
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+    .antwoord {
+      font-size: 1.2rem;
+      color: #444;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border-radius: 8px;
       cursor: pointer;
-      transition: all 0.3s ease;
-      background-color: #f9f9f9;
-    }
-    .card:hover {
-      background-color: #eee;
-    }
-    .controls {
-      text-align: center;
-      margin-top: 10px;
     }
   </style>
 </head>
 <body>
 
   <a href="index.html">← Terug naar menu</a>
-  <h1>🃏 Flashcards-modus</h1>
+  <h1>🃏 Flashcards</h1>
 
-  <div id="cardContainer"></div>
-  <div class="controls">
-    <button onclick="volgendeKaart()">Volgende kaart</button>
-  </div>
+  <div id="kaartContainer"></div>
+  <button onclick="volgendeKaart()">Volgende kaart</button>
 
   <script>
     const gekozen = localStorage.getItem("gekozenLijst");
@@ -52,39 +60,29 @@
     const flashcards = regels.map(r => r.split(",").map(s => s.trim())).filter(p => p.length === 2);
 
     let index = 0;
-    let antwoordZichtbaar = false;
 
     function toonKaart() {
       if (index >= flashcards.length) {
-        document.getElementById("cardContainer").innerHTML = "<p>Klaar met alle kaarten!</p>";
+        document.getElementById("kaartContainer").innerHTML = "<p>🎉 Je bent klaar!</p>";
         return;
       }
 
-      const kaart = flashcards[index];
-      const inhoud = antwoordZichtbaar ? kaart[1] : kaart[0];
-      const label = antwoordZichtbaar ? "Antwoord" : "Vraag";
-
-      document.getElementById("cardContainer").innerHTML = `
-        <div class="card" onclick="draaiKaart()">
-          <strong>${label}:</strong><br>${inhoud}
+      const [vraag, antwoord] = flashcards[index];
+      document.getElementById("kaartContainer").innerHTML = `
+        <div class="card">
+          <div class="vraag">${vraag}</div>
+          <div class="lijn"></div>
+          <div class="antwoord">${antwoord}</div>
         </div>
       `;
     }
 
-    function draaiKaart() {
-      antwoordZichtbaar = !antwoordZichtbaar;
-      toonKaart();
-    }
-
     function volgendeKaart() {
       index++;
-      antwoordZichtbaar = false;
       toonKaart();
     }
 
-    window.draaiKaart = draaiKaart;
     window.volgendeKaart = volgendeKaart;
-
     toonKaart();
   </script>
 
