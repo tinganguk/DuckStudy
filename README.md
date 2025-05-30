@@ -1,2 +1,3 @@
 # DuckStudy
-Een FOSS website voor Studygo
+Een FOSS website voor Studygo logo.png
+
