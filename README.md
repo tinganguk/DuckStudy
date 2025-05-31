@@ -2,4 +2,4 @@
 
 Een FOSS website voor Studygo (tinganguk/DuckStudy/logo.png)
 
-![Logo](DuckStudy/logo.png)
+(DuckStudy/README.md/main/logo.png)
