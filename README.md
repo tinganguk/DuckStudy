@@ -1,5 +1,5 @@
 # DuckStudy
 
-Een FOSS website voor Studygo (tinganguk/DuckStudy/logo.png)
+Een FOSS website voor Studygo
 
-(DuckStudy/README.md/main/logo.png)
+![Logo](logo.png)
